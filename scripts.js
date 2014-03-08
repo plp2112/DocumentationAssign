@@ -10,47 +10,41 @@
 */
 
 function infoLoaded(UEMP270V){
-	var Observe = UEMP270V.observations;
 	
 	console.log(UEMP270V);
 	
-	var Containerlist = [];
-	//to create my visualization, I need to convert
-	//my JSON data to an array of arrays, using a for loop
-	//I need headers to be first
-	var myHeader = ["Date", "Value"];
-	Containerlist.push(myHeader);
 	
-	//specify starting point, ending point
-	for(var i=0; i<Observe.length; i++){
-		//create reference to current object in list
-		var object = Observe[i];
-		//Create little array with date and value
-		var array = [object.date, Number (object.value)];
-		//Put array into Containerlist
-		Containerlist.push(array);
-	}
-	//at end of for loop, Containerlist should be populated with 
-	//array of arrays that is date and value of observations
-	console.log(Containerlist);
-	//feed data to visualization library
-	var DataTable = google.visualization.arrayToDataTable(Containerlist);
+	//I need headers to be first
+	var myHeader = UEMP270V.columns;
+	
+	//Using documentation, construct dataTable element to make better use of format
+	var dataTable = new google.visualization.DataTable();
+	//Date - String will be first element of header array
+	dataTable.addColumn('string', myHeader[0]);
+	//Value - Second element of header array:
+	dataTable.addColumn('number', myHeader[1]);
+	//"Add rows" will point to rows from json
+	dataTable.addRows(UEMP270V.rows);
+	
+	
+	
 	
 	//create options object to customize chart look
 	var options = {
-		title: "Unemployment: 1980 - 2013"
+		title: "Unemployment"
 	}
 	
 	//equivalent to jQuery $("#divName")
 	var chart = new google.visualization.LineChart(document.getElementById("EmptyDiv"));
-		chart.draw(DataTable, options);
+		chart.draw(dataTable, options);
+		
 }
 
 //defining my google.load callback
 function Pkgloaded(){
 	console.log("Google pkg loaded");
 	//setting up jQuery "get" call to load data
-	//$.get("UEMP270V_data.json", infoLoaded, "json");
+	$.get("https://www.googleapis.com/fusiontables/v1/query?sql=SELECT+*+FROM+1SYj4ZtlF7Z_HLZEeqM5Kuq00uac-VB5X8mXgUryW+WHERE+DATE%3E'1979-12-01'&key=AIzaSyBlA0mcZv-0_h1v-oB1ayLAWK6zQ8CCSnc", infoLoaded, "json");
 }
 
 //defining document ready callback
